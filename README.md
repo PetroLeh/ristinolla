@@ -11,5 +11,7 @@
 - Toteutettava algoritmi minimax alpha-beta-karsinnalla.
 
 - Parhaiten hallussa olevat ohjelmointikielet: **Python** ja **Java**.
-Kohtuullista, mutta heikompaa osaamista kielistä: C, C++, JavaScript, Ruby. 
+Kohtuullista, mutta heikompaa osaamista kielistä: C, C++, JavaScript, Ruby.
+
+[viikkoraportti 1](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/viikkoraportti_1.md)
 
