@@ -8,7 +8,8 @@
 
 
 - Tavoitteena tehdä ristinolla-peli vaihdettavalla pelialueen koolla ja voittolinjan pituudella.
-- Dokumenttien ja koodin kieli tulee olemaan suomi ja ohjelmointikieli Python.
+- Dokumenttien kieli tulee olemaan suomi, koodin kieli englanti ja ohjelmointikieli Python.
+- _edit: vaihdoin koodin kielen suomesta englanniksi, sillä se tuntuu koodissa luontevammalta._
 
 - Toteutettava algoritmi minimax alpha-beta-karsinnalla.
 
