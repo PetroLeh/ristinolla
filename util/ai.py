@@ -21,9 +21,9 @@ class Minimax:
             best_score = 1000
             turn = self.__opponent
         
-        if (maximizing and board.is_winning(move, self.__player)):
+        if maximizing and board.is_winning(move, self.__player):
             return (move, 1000)
-        elif(not maximizing and board.is_winning(move, self.__opponent)):
+        elif not maximizing and board.is_winning(move, self.__opponent):
             return (move, -1000)
         elif board.is_full():
             return (move, 0)
