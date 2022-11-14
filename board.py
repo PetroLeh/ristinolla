@@ -16,6 +16,7 @@ class Board:
         return self.__grid[row][col]
 
     def set_cell(self, move: tuple, player):
+        if not move: return False
         row, col = move
         if self.is_on_board(row, col) and self.__grid[row][col] == 0:
             self.__grid[row][col] = player
