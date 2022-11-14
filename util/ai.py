@@ -7,7 +7,7 @@ class Minimax:
         self.__opponent = -player
 
     def select_move(self, board):
-        #return self.select_random(board)
+        return self.select_random(board)
 
         move, score = self.minmax(None, board, True)
         return move

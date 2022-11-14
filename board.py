@@ -28,6 +28,10 @@ class Board:
     
     def set_empty(self, row: int, col: int):
         self.__grid[row][col] = 0
+    
+    def clear(self):
+        row = [0 for i in range(self.size())]
+        self.__grid = [row[:] for i in range(self.size())]
 
     def is_on_board(self, row: int, col: int):
         return row >= 0 and row < self.size() and col >= 0 and col < self.size()
