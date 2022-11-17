@@ -37,29 +37,40 @@ def start(board):
     while True:        
 
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN and turn == player_one:
-                move = get_cell_from_coordinates(event.pos, board)
-            if game_over and event.type == pygame.KEYDOWN:
-                turn = player_one
-                board.clear()
-                game_over = False
-                move = None
-                show(board, scene)
-
             if event.type == pygame.QUIT:
                 exit()
+            
+            if not game_over:
+                if turn == player_one:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        marked_cell = get_cell_from_coordinates(event.pos, board)
+                        mark_cell(marked_cell, player_one_color, scene)
 
-        if turn == player_two:
-            move = ai.select_move(board)
-        
-        if move and not game_over:
-            if board.set_cell(move, turn):
-                show(board, scene)
-                if board.is_winning(move, turn):
-                    show_winner(turn, board, scene)
-                    game_over = True
-                turn *= -1
-                move = None
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        current_cell = get_cell_from_coordinates(event.pos, board)
+                        move = marked_cell if marked_cell == current_cell else remove_mark(marked_cell, scene)
+
+                if turn == player_two:
+                    move = ai.select_move(board)
+
+                if move:
+                    if board.set_cell(move, turn):
+                        show(board, scene)
+                        if board.is_winning(move, turn):
+                            show_winner(turn, board, scene)
+                            game_over = True
+                        turn *= -1
+                        move = None
+
+            else:
+                if event.type == pygame.KEYDOWN:
+                    game_over = False
+                    move = None
+                    turn = player_one
+                    board.clear()
+
+                    show(board, scene)
+
             
 def show(board, scene):
     grid = board.grid()
@@ -87,8 +98,7 @@ def show(board, scene):
 
 def get_cell_from_coordinates(pos: tuple, board):
     x, y = pos
-    if x > board.size() * (cell_size + wall): return None
-    
+     
     col = int(x / (cell_size + wall))
     row = int(y / (cell_size + wall))
 
@@ -126,3 +136,15 @@ def show_winner(player, board, scene):
         pygame.draw.circle(scene, (200,200,200), (middle, middle), int(cs - 5 * wall))
     
     pygame.display.flip()
+
+def mark_cell(cell, color, scene):
+    y, x = cell
+    x *= (cell_size + wall)
+    y *= (cell_size + wall)
+    x += (wall * 2)
+    y += (wall * 2)
+    pygame.draw.rect(scene, color, (x, y, cell_size - wall * 2, cell_size - wall * 2))
+    pygame.display.flip()
+    
+def remove_mark(cell, scene):
+    mark_cell(cell, (200, 200, 200), scene)

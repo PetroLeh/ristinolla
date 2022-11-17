@@ -20,9 +20,9 @@ class TestBoard(unittest.TestCase):
     def test_setting_a_value_to_empty_cell_works(self):
         player = 1
         
-        self.assertEqual(self.board.get_cell(0, 0), 0)
+        self.assertEqual(self.board.get_cell((0, 0)), 0)
         self.board.set_cell((0, 0), player)
-        self.assertEqual(self.board.get_cell(0, 0), player)
+        self.assertEqual(self.board.get_cell((0, 0)), player)
 
     def test_value_of_non_empty_cell_cannot_be_changed(self):
         player_one = 1
@@ -31,4 +31,4 @@ class TestBoard(unittest.TestCase):
         self.board.set_cell((0, 0), player_one)
         self.board.set_cell((0, 0), player_two)
 
-        self.assertEqual(self.board.get_cell(0, 0), player_one)
+        self.assertEqual(self.board.get_cell((0, 0)), player_one)
