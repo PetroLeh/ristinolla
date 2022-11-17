@@ -39,12 +39,17 @@ def start(board):
     game_over = False
 
     while True:        
+        
+        if not game_over:
+        
+            if turn == player_two:
+                move = ai.select_move(board)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
-            
-            if not game_over:
+            for event in pygame.event.get():                
+
+                if event.type == pygame.QUIT:
+                    exit()                    
+
                 if turn == player_one:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         marked_cell = get_cell_from_coordinates(event.pos, board)
@@ -55,27 +60,24 @@ def start(board):
                         current_cell = get_cell_from_coordinates(event.pos, board)
                         move = marked_cell if marked_cell == current_cell else remove_mark(marked_cell, scene)
 
-                if turn == player_two:
-                    move = ai.select_move(board)
+            if move:
+                if board.set_cell(move, turn):
+                    show(board, scene)
+                    if board.is_winning(move, turn):
+                        show_winner(turn, board, scene)
+                        game_over = True
+                    turn *= -1
+                    move = None
 
-                if move:
-                    if board.set_cell(move, turn):
-                        show(board, scene)
-                        if board.is_winning(move, turn):
-                            show_winner(turn, board, scene)
-                            game_over = True
-                        turn *= -1
-                        move = None
-
-            else:
-                if event.type == pygame.KEYDOWN:
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     game_over = False
                     move = None
                     turn = player_one
                     board.clear()
 
                     show(board, scene)
-
             
 def show(board, scene):
     grid = board.grid()
@@ -87,15 +89,9 @@ def show(board, scene):
         for cell in row:            
             pygame.draw.rect(scene, (200,200,200), (x, y, cell_size, cell_size))
             if cell == player_one:
-                pygame.draw.line(scene, player_one_color, (x + wall, y + wall), (x + cell_size - 2 * wall, y + cell_size - 2 * wall), 2 * wall )
-                pygame.draw.line(scene, player_one_color, (x + cell_size - 2 * wall, y + wall), (x + wall, y + cell_size - 2 * wall), 2 * wall )
-
+                draw_player_one(x, y, scene)
             if cell == player_two:
-                middle_x = int(x + cell_size / 2)
-                middle_y = int(y + cell_size / 2)
-                pygame.draw.circle(scene, player_two_color, (middle_x, middle_y), int(cell_size / 2 - wall))
-                pygame.draw.circle(scene, (200,200,200), (middle_x, middle_y), int(cell_size / 2 - 3 * wall))
-
+                draw_player_two(x, y, scene)
             x += cell_size + wall
         y += cell_size + wall
         
@@ -103,8 +99,7 @@ def show(board, scene):
     pygame.display.flip()
 
 def get_cell_from_coordinates(pos: tuple, board):
-    x, y = pos
-     
+    x, y = pos     
     col = int(x / (cell_size + wall))
     row = int(y / (cell_size + wall))
 
@@ -156,10 +151,10 @@ def remove_mark(cell, scene):
     mark_cell(cell, (200, 200, 200), scene)
 
 def show_heat_maps(board, scene):
-    show_heat_map(board, scene)
-    show_heat_map2(board, scene)
+    show_heat_map_1(board, scene)
+    show_heat_map_2(board, scene)
 
-def show_heat_map(board, scene):
+def show_heat_map_1(board, scene):
     heat_map = board.heat_map()
 
     scale = 2
@@ -173,7 +168,7 @@ def show_heat_map(board, scene):
             x += ((cell_size + wall) / scale)
         y += ((cell_size + wall) / scale)
 
-def show_heat_map2(board, scene):
+def show_heat_map_2(board, scene):
     heat_map = board.heat_map()
 
     scale = 2
@@ -186,3 +181,13 @@ def show_heat_map2(board, scene):
 
             x += ((cell_size + wall) / scale)
         y += ((cell_size + wall) / scale)
+
+def draw_player_one(x: int , y: int, scene):
+    pygame.draw.line(scene, player_one_color, (x + wall, y + wall), (x + cell_size - 2 * wall, y + cell_size - 2 * wall), 2 * wall )
+    pygame.draw.line(scene, player_one_color, (x + cell_size - 2 * wall, y + wall), (x + wall, y + cell_size - 2 * wall), 2 * wall )
+
+def draw_player_two(x:int, y:int, scene):
+    middle_x = int(x + cell_size / 2)
+    middle_y = int(y + cell_size / 2)
+    pygame.draw.circle(scene, player_two_color, (middle_x, middle_y), int(cell_size / 2 - wall))
+    pygame.draw.circle(scene, (200,200,200), (middle_x, middle_y), int(cell_size / 2 - 3 * wall))
