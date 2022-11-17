@@ -8,4 +8,4 @@ Ensimmäinen versio heat mapista on sellainen, jossa painottuu ainoastaan pelatt
 
 Toisen version (, jota ei vielä ole) on tarkoitus painottaa ruutuja, joista alkaa kolmen mittaisia suoria tai - jos niihin pelattaisiin - muodostuisi neljän mittaisia suoria.
 
-![kuvakaappaus pelistä](/kuvat/heat_map.png) 
+![kuvakaappaus pelistä](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/kuvat/heat_map.png) 
