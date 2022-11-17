@@ -3,7 +3,8 @@ class Board:
     def __init__(self, size: int, winning_length: int):
         row = [0 for i in range(size)]
         self.__grid = [row[:] for i in range(size)]
-
+        self.__heat_map = [row[:] for i in range(size)]
+        self.__heat_map_v2 = [row[:] for i in range(size)]
         self.__winning_length = winning_length
 
     def grid(self):
@@ -23,7 +24,8 @@ class Board:
         return False
    
     def is_empty(self, cell: tuple):
-        row, col = cell
+        if not self.is_on_board(cell): return False
+        row, col = cell        
         return self.__grid[row][col] == 0
     
     def set_empty(self, cell: tuple):
@@ -78,3 +80,23 @@ class Board:
             if 0 in row:
                 return False
         return True
+    
+    def heat_map(self):
+        for row in range(self.size()):
+            for col in range(self.size()):
+                cell = (row, col)
+                if self.is_empty(cell): self.__heat_map[row][col] = self.heat(cell)
+                else: self.__heat_map[row][col] = 0
+        return self.__heat_map
+    
+    def heat(self, cell: tuple):
+        h = 0
+        surrounding_cells = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
+        row, col = cell
+        for c in surrounding_cells:
+            delta_row, delta_col = c
+            new_row = row + delta_row
+            new_col = col + delta_col
+            if self.is_on_board((new_row, new_col)) and not self.is_empty((new_row, new_col)):
+                h += 1
+        return h

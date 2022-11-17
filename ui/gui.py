@@ -1,28 +1,31 @@
 import pygame
 from util.ai import Minimax
+import util.config as config
 
-cell_size = 30
-wall = 2
 width = 0
 height = 0
 
 player_one = 1
 player_two = -1
 
-player_one_color = (100,100,200)
-player_two_color = (200,100,100)
-
-ai = Minimax(player_two)
+player_one_color = config.player_one_color
+player_two_color = config.player_two_color
+cell_size = config.cell_size
+wall = config.wall_thickness
+hm = False
 
 def start(board):
+    ai = Minimax(player_two)
         
     pygame.init()
 
     global width
     global height
+    global hm
 
-    width = board.size() * (cell_size + wall) + 2 * wall
-    height = width
+    hm = config.heat_map
+    height = board.size() * (cell_size + wall) + 2 * wall
+    width = int(height * 1.5) if hm else height
 
     scene = pygame.display.set_mode((width, height))
     pygame.display.set_caption('Ristinolla')
@@ -30,6 +33,7 @@ def start(board):
     show(board, scene)
 
     cell = None
+    marked_cell = None
     move = None
     turn = player_one
     game_over = False
@@ -44,9 +48,10 @@ def start(board):
                 if turn == player_one:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         marked_cell = get_cell_from_coordinates(event.pos, board)
-                        mark_cell(marked_cell, player_one_color, scene)
+                        if board.is_empty(marked_cell): mark_cell(marked_cell, player_one_color, scene)
+                        else: marked_cell = None
 
-                    if event.type == pygame.MOUSEBUTTONUP:
+                    if event.type == pygame.MOUSEBUTTONUP and marked_cell:
                         current_cell = get_cell_from_coordinates(event.pos, board)
                         move = marked_cell if marked_cell == current_cell else remove_mark(marked_cell, scene)
 
@@ -74,8 +79,8 @@ def start(board):
             
 def show(board, scene):
     grid = board.grid()
-    scene.fill((100, 100, 100))
-    
+    scene.fill((100, 100, 100))    
+
     y = wall
     for row in grid:
         x = wall
@@ -86,14 +91,15 @@ def show(board, scene):
                 pygame.draw.line(scene, player_one_color, (x + cell_size - 2 * wall, y + wall), (x + wall, y + cell_size - 2 * wall), 2 * wall )
 
             if cell == player_two:
-                middle_x = int(x + cell_size / wall)
-                middle_y = int(y + cell_size / wall)
+                middle_x = int(x + cell_size / 2)
+                middle_y = int(y + cell_size / 2)
                 pygame.draw.circle(scene, player_two_color, (middle_x, middle_y), int(cell_size / 2 - wall))
                 pygame.draw.circle(scene, (200,200,200), (middle_x, middle_y), int(cell_size / 2 - 3 * wall))
 
             x += cell_size + wall
         y += cell_size + wall
-    
+        
+    if hm: show_heat_maps(board, scene)
     pygame.display.flip()
 
 def get_cell_from_coordinates(pos: tuple, board):
@@ -111,7 +117,7 @@ def show_winner(player, board, scene):
     else:
         winner_color = player_two_color
 
-    middle = int(width / 2)
+    middle = int(height / 2)
     big_font = pygame.font.SysFont('Arial', 48)
     small_font = pygame.font.SysFont('Arial', 22)
     winner = big_font.render('Voittaja on', True, winner_color)
@@ -148,3 +154,35 @@ def mark_cell(cell, color, scene):
     
 def remove_mark(cell, scene):
     mark_cell(cell, (200, 200, 200), scene)
+
+def show_heat_maps(board, scene):
+    show_heat_map(board, scene)
+    show_heat_map2(board, scene)
+
+def show_heat_map(board, scene):
+    heat_map = board.heat_map()
+
+    scale = 2
+    y = wall
+    for row in heat_map:
+        x = 2 * wall + board.size() * (cell_size + wall)
+        for cell in row:
+            r = 95 + 20 * cell          
+            pygame.draw.rect(scene, (r, 95, 110), (x, y, cell_size / scale, cell_size / scale))
+
+            x += ((cell_size + wall) / scale)
+        y += ((cell_size + wall) / scale)
+
+def show_heat_map2(board, scene):
+    heat_map = board.heat_map()
+
+    scale = 2
+    y = int((2 * wall + board.size() * (cell_size + wall)) / 2)
+    for row in heat_map:
+        x = 2 * wall + board.size() * (cell_size + wall)
+        for cell in row:
+            r = 95 + 20 * cell          
+            pygame.draw.rect(scene, (r, 110, 95), (x, y, cell_size / scale, cell_size / scale))
+
+            x += ((cell_size + wall) / scale)
+        y += ((cell_size + wall) / scale)
