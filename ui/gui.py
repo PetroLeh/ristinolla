@@ -66,6 +66,8 @@ def start(board):
                     if board.is_winning(move, turn):
                         show_winner(turn, board, scene)
                         game_over = True
+                    if board.is_full():
+                        game_over == True
                     turn *= -1
                     move = None
 
@@ -155,7 +157,7 @@ def show_heat_maps(board, scene):
     show_heat_map_2(board, scene)
 
 def show_heat_map_1(board, scene):
-    heat_map = board.heat_map()
+    heat_map = board.heat_map2(player_one)
 
     scale = 2
     y = wall
@@ -169,7 +171,7 @@ def show_heat_map_1(board, scene):
         y += ((cell_size + wall) / scale)
 
 def show_heat_map_2(board, scene):
-    heat_map = board.heat_map()
+    heat_map = board.heat_map2(player_two)
 
     scale = 2
     y = int((2 * wall + board.size() * (cell_size + wall)) / 2)

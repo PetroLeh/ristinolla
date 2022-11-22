@@ -1,95 +1,84 @@
 from random import randint
+import math
 
 class Minimax:
 
     def __init__(self, player):
-        self.__player = player
-        self.__opponent = -player
+        self.maximizer = player
+        self.minimizer= -player
 
     def select_move(self, board):
         #move = self.select_random(board)
-        #best, move = self.minmax(None, board, True)
-        #best, move = self.minmax_v2(3, board, None, self.__player)
-        move = self.minmax_v3(board, None, self.__player)
-        return move
 
-    def minmax_v3(self, board, move, turn):
-        h_map = board.heat_map()
-        hots = self.hot_cells(h_map)
-        if hots:
-            hottest = hots[0]
-            for row in range(len(h_map)):
-                for col in range(len(h_map)):
-                    hottest_row, hottest_col = hottest
-                    if h_map[row][col] > h_map[hottest_row][hottest_col]: hottest = (row, col)
-            return hottest
-        else:
-            return self.select_random(board)
-
-
-    def minmax_v2(self, depth, board, move, turn):
-        if turn == self.__player:
-            best = -1000
-            if board.is_winning(move, self.__player):
-                return (1000, move)
-        else:
-            best = 1000
-            if board.is_winning(move, self.__opponent):
-                return (-1000, move)
+        move, score = self.minmax(board, math.inf, -math.inf, self.maximizer, None)
         
-        if board.is_full() or depth == 0:
-            return (0, move)
-    
-        for cell in self.hot_cells(board.heat_map()):
+        print(move)
+        return move
+  
 
-            board.set_cell(cell, turn)
-            score, m = self.minmax_v2(depth - 1, board, cell, turn * -1)
-            board.set_empty(cell)
-            if turn == self.__player:
-                if score > best:
-                    best = score
-                    move = m
+    def minmax(self, board, a, b, turn, last_move):
+
+        if last_move: 
+            last_cell, last_player = last_move
+
+            if board.is_winning(last_cell, last_player):
+                score = 1000 if last_player == self.maximizer else -1000
+                return (last_cell, score)
+            if board.is_full():
+                return (last_cell, self.evaluate(board, turn))
+
+        moves = self.heat_map_as_list(board.heat_map())
+        best_move = moves[0]
+
+        best_score = -math.inf if turn == self.maximizer else math.inf
+
+        for move in moves:
+            board.set_cell(move, turn)
+            last_move = (move, turn)
+            m, score = self.minmax(board, a, b, turn * -1, last_move)
+            board.set_empty(move)
+            if turn == self.maximizer:
+                if score > best_score:
+                    best_score = score
+                    best_move = m
+                a = max(a, score)
             else:
-                if score < best:
-                    best = score
-                    move = m
-        return (best, move)
-    
-    def hot_cells(self, heat_map):
+                if score < best_score:
+                    best_score = score
+                    best_move = m
+                b = min(b, score)                
+            if b <= a:
+                break
+        return (best_move, best_score)
+
+    def evaluate(self, board, player):
+        h_map_maximizer = board.heat_map2(self.maximizer)
+        h_map_minimizer = board.heat_map2(self.minimizer)
+        m_heat_maximizer = self.max_heat(h_map_maximizer)
+        m_heat_minimizer = self.max_heat(h_map_minimizer)
+
+        if player == self.maximizer:
+            if m_heat_maximizer > m_heat_minimizer:
+                return m_heat_maximizer
+            return -m_heat_minimizer * 10
+        
+        if m_heat_minimizer > m_heat_maximizer:
+            return -m_heat_minimizer
+        return m_heat_maximizer * 10
+
+
+    def max_heat(self, heat_map):
+        m = 0
+        for row in heat_map:
+            m = max(m, max(row))
+        return m
+
+    def heat_map_as_list(self, heat_map):
         res = []
         for row in range(len(heat_map)):
             for col in range(len(heat_map)):
                 if heat_map[row][col] > 0: res.append((row, col))
         return res
-
-    def minmax(self, move, board, maximizing):
-        
-        if maximizing:
-            best_score = -1000
-            turn = self.__player
-        else:
-            best_score = 1000
-            turn = self.__opponent
-        
-        if maximizing and board.is_winning(move, self.__player):
-            return (1000, move)
-        elif not maximizing and board.is_winning(move, self.__opponent):
-            return (-1000, move)
-        elif board.is_full():
-            return (0, move)
-
-        for row in range(board.size()):
-            for col in range(board.size()):
-                move = (row, col)
-                if board.is_empty(move):
-                    board.set_cell(move, turn)
-                    score, m = self.minmax(move, board, not maximizing)
-                    board.set_empty(move)
-                    if maximizing and score >= best_score:
-                        return (score, m)
-                    if not maximizing and score <= best_score:
-                        return (score, m)
-
 
     def select_random(self, board):
         row = randint(0, board.size() - 1)

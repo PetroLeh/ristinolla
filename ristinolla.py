@@ -1,6 +1,6 @@
 import sys
 
-from board import Board
+from util.board import Board
 import ui.text_ui as tui
 import ui.gui as gui
 import util.config as config
