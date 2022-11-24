@@ -58,7 +58,7 @@ class Board:
             row, col = start
             row_dir, col_dir = direction   
             new_row, new_col = (row + row_dir, col + col_dir)
-            if self.is_on_board((new_row, new_col)) and self.__grid[new_row][new_col] == player:
+            if self.is_on_board((new_row, new_col)) and (self.__grid[new_row][new_col] == player or (new_row, new_col) == move):
                 return 1 + line_length((new_row, new_col), direction, player)
             else:
                 return 1              
@@ -138,3 +138,12 @@ class Board:
                 if player:
                     h = max(h, count_symbols(cell, d, player))
         return min(h, 8)
+
+    def is_full_after(self, move):
+        self.set_cell(move, 3)
+        if self.is_full():
+            self.set_empty(move)
+            return True
+        self.set_empty(move)
+        return False
+        

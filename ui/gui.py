@@ -28,7 +28,7 @@ def start(board):
     width = int(height * 1.5) if hm else height
 
     scene = pygame.display.set_mode((width, height))
-    pygame.display.set_caption('Ristinolla')
+    pygame.display.set_caption('Ristinolla - vuorossa X')
 
     show(board, scene)
 
@@ -67,8 +67,13 @@ def start(board):
                         show_winner(turn, board, scene)
                         game_over = True
                     if board.is_full():
-                        game_over == True
-                    turn *= -1
+                        pygame.display.set_caption('Ristinolla - tasapeli')
+                        game_over = True
+                        turn = player_one                        
+                    else:
+                        turn *= -1
+                        if turn == player_one: pygame.display.set_caption('Ristinolla - vuorossa X')
+                        else: pygame.display.set_caption('Ristinolla - vuorossa O')
                     move = None
 
         else:
@@ -131,10 +136,12 @@ def show_winner(player, board, scene):
     if player == player_one:
         x = y = int(middle - cs / 2)
 
+        pygame.display.set_caption('Ristinolla - X voitti')
         pygame.draw.line(scene, player_one_color, (x, y), (x + cs, y + cs), 4 * wall )
         pygame.draw.line(scene, player_one_color, (x + cs, y), (x, y + cs), 4 * wall )
 
     else:
+        pygame.display.set_caption('Ristinolla - O voitti')
         pygame.draw.circle(scene, player_two_color, (middle, middle), int(cs))
         pygame.draw.circle(scene, (200,200,200), (middle, middle), int(cs - 5 * wall))
     
