@@ -46,19 +46,18 @@ class Minimax:
 
         best = -math.inf if turn == self.maximizer else math.inf
         moves = self.heat_map_as_list(board.heat_map())
-        if turn == self.maximizer:
-            for next_move in moves:
-                best = max(best, self.minmax(depth - 1, board, next_move, self.minimizer, a, b, move_set))
-                if best <= a:
-                    print(f'a: {a} best: {best}')
-                    break
-        else:
-            for next_move in moves:
-                best = min(best, self.minmax(depth - 1, board, next_move, self.maximizer, a, b, move_set))
-                if best >= b: 
-                    print(f'b: {b} best: {best}')
-                    break
 
+        for next_move in moves:
+            score = self.minmax(depth - 1, board, next_move, turn * -1, a, b, move_set)
+            if turn == self.maximizer:
+                best = max(best, score)
+                a = max(a, best)
+            else:
+                best = min(best, score)
+                b = min(b, best)
+
+            if b <= a: break
+            
         board.set_empty(move)
         return best
 
