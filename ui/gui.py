@@ -116,34 +116,36 @@ def show_winner(player, board, scene):
 
     if player == player_one:
         winner_color = player_one_color
+        w = 'X'
     else:
         winner_color = player_two_color
+        w = 'O'
 
     middle = int(height / 2)
     big_font = pygame.font.SysFont('Arial', 48)
     small_font = pygame.font.SysFont('Arial', 22)
-    winner = big_font.render('Voittaja on', True, winner_color)
-    new_game = small_font.render('aloita uusi peli painamalla jotain näppäintä', False, winner_color)
+    winner = big_font.render(f'Voittaja on {w}', True, winner_color, (200,200,200))
+    new_game = small_font.render('aloita uusi peli painamalla jotain näppäintä', True, winner_color, (200,200,200))
 
     box_size = 440
-    pygame.draw.rect(scene, (100,100,100), (middle - int(box_size / 2), middle - int(box_size / 2), box_size, box_size))
-    pygame.draw.rect(scene, (200,200,200), (middle - int(box_size / 2) + wall, middle - int(box_size / 2) + wall, box_size - 2 * wall, box_size - 2 * wall))
+    #pygame.draw.rect(scene, (100,100,100), (middle - int(box_size / 2), middle - int(box_size / 2), box_size, box_size))
+    #pygame.draw.rect(scene, (200,200,200), (middle - int(box_size / 2) + wall, middle - int(box_size / 2) + wall, box_size - 2 * wall, box_size - 2 * wall))
     scene.blit(winner, (middle - 120, middle - 120))
 
     scene.blit(new_game, (middle - 200, middle + 120))
     
     cs = cell_size * 2
-    if player == player_one:
-        x = y = int(middle - cs / 2)
+    # if player == player_one:
+    #     x = y = int(middle - cs / 2)
 
-        pygame.display.set_caption('Ristinolla - X voitti')
-        pygame.draw.line(scene, player_one_color, (x, y), (x + cs, y + cs), 4 * wall )
-        pygame.draw.line(scene, player_one_color, (x + cs, y), (x, y + cs), 4 * wall )
+    #     pygame.display.set_caption('Ristinolla - X voitti')
+    #     pygame.draw.line(scene, player_one_color, (x, y), (x + cs, y + cs), 4 * wall )
+    #     pygame.draw.line(scene, player_one_color, (x + cs, y), (x, y + cs), 4 * wall )
 
-    else:
-        pygame.display.set_caption('Ristinolla - O voitti')
-        pygame.draw.circle(scene, player_two_color, (middle, middle), int(cs))
-        pygame.draw.circle(scene, (200,200,200), (middle, middle), int(cs - 5 * wall))
+    # else:
+    #     pygame.display.set_caption('Ristinolla - O voitti')
+    #     pygame.draw.circle(scene, player_two_color, (middle, middle), int(cs))
+    #     pygame.draw.circle(scene, (200,200,200), (middle, middle), int(cs - 5 * wall))
     
     pygame.display.flip()
 

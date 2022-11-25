@@ -6,9 +6,22 @@ class Board:
         self.__heat_map = [row[:] for i in range(size)]
         self.__heat_map2 = [row[:] for i in range(size)]
         self.__winning_length = winning_length
+    
+    def __str__(self):
+        s = ''
+        for row in self.__grid:
+            if 1 in row or -1 in row:
+                r = ''.join(map(str, row))
+            else:
+                r = 'e'
+            s += r
+        return s
 
     def grid(self):
         return self.__grid
+    
+    def middle(self):
+        return self.__grid[self.size() // 2][self.size() // 2]
     
     def get_cell(self, cell: tuple):
         row, col = cell
@@ -139,11 +152,6 @@ class Board:
                     h = max(h, count_symbols(cell, d, player))
         return min(h, 8)
 
-    def is_full_after(self, move):
-        self.set_cell(move, 3)
-        if self.is_full():
-            self.set_empty(move)
-            return True
-        self.set_empty(move)
-        return False
+    def winning_length(self):
+        return self.__winning_length
         
