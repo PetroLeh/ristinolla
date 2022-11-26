@@ -134,10 +134,12 @@ class Board:
             if self.is_on_board(d_cell):
                 return self.get_cell(d_cell)
 
-        def count_symbols(c, d, player):
+        def count_symbols(c, d, player, n):
             d_cell = get_delta_cell(c, d)
             if self.is_on_board(d_cell) and self.get_cell(d_cell) == player:
-                return 2 + count_symbols(d_cell, d, player)
+                return n + count_symbols(d_cell, d, player, n + 0.5)
+            elif self.is_on_board(d_cell) and self.get_cell(d_cell) == 0 and n >= 2:
+                return 1
             return 0
     
         h = 0
@@ -145,13 +147,19 @@ class Board:
                       (-1, -1), (-1, 1), (0, -1), (-1, 0)]
         for d in directions:
             if player:
-                h = max(h, count_symbols(cell, d, player))
+                #h = max(h, count_symbols(cell, d, player))
+                h += count_symbols(cell, d, player, 1)
             else:
                 player = start_of_line(cell, d)
                 if player:
-                    h = max(h, count_symbols(cell, d, player))
-        return min(h, 8)
+                    #h = max(h, count_symbols(cell, d, player))
+                    h += count_symbols(cell, d, player, 1)
+        return h
 
     def winning_length(self):
         return self.__winning_length
+
+    def is_on_border(self, cell):
+        row, col = cell
+        return row == 0 or col == 0 or row == self.size() - 1 or col == self.size() - 1
         

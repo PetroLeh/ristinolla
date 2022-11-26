@@ -15,7 +15,7 @@ wall = config.wall_thickness
 hm = False
 
 def start(board):
-    ai = Minimax(player_two)
+    ai = Minimax(player_two, config.max_depth_in_minimax)
         
     pygame.init()
 
@@ -173,7 +173,7 @@ def show_heat_map_1(board, scene):
     for row in heat_map:
         x = 2 * wall + board.size() * (cell_size + wall)
         for cell in row:
-            r = 95 + 20 * cell          
+            r = min(255, 95 + 20 * cell)
             pygame.draw.rect(scene, (r, 95, 110), (x, y, cell_size / scale, cell_size / scale))
 
             x += ((cell_size + wall) / scale)
@@ -187,7 +187,7 @@ def show_heat_map_2(board, scene):
     for row in heat_map:
         x = 2 * wall + board.size() * (cell_size + wall)
         for cell in row:
-            r = 95 + 20 * cell          
+            r = min(255, 95 + 20 * cell)
             pygame.draw.rect(scene, (r, 110, 95), (x, y, cell_size / scale, cell_size / scale))
 
             x += ((cell_size + wall) / scale)

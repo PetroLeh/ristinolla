@@ -8,3 +8,5 @@ wall_thickness = 2
 
 board_size = 25
 winning_length = 5
+
+max_depth_in_minimax = 5
