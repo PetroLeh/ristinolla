@@ -6,7 +6,7 @@ player_two_color = (200,100,100)
 cell_size = 40
 wall_thickness = 2
 
-board_size = 25
+board_size = 10
 winning_length = 5
 
 max_depth_in_minimax = 5
