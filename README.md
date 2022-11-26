@@ -18,7 +18,7 @@
 ##### käynnistys
 - käynnistä ohjelma komennolla `python3 ristinolla.py` tai `poetry run python3 ristinolla.py`
 
-- käynnistäessä voi antaa kännistysargumentteja:
+- käynnistäessä voi antaa käynnistysargumentteja:
     - `-t` tai `--text`: ohjelma käynnistyy tekstikäyttöliittymässä
     - `-hm` tai `--heat_map`: graafisessa käyttöliittymässä tulee näkyviin pari versiota ["heat mapeista"](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/heat_map.md)
     - `<N>:<M>`: pelialue on N*N ruudukko ja M on voittoon tarvittava pituus (N=3-25 M=3-6)
