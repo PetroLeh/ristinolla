@@ -26,6 +26,6 @@ def main():
     if winning_length > board_size: winning_length = board_size
     board = Board(board_size, winning_length)
     ui.start(board)
-    
+
 if __name__ == '__main__':
     main()

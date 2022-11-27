@@ -147,13 +147,28 @@ class Board:
                       (-1, -1), (-1, 1), (0, -1), (-1, 0)]
         for d in directions:
             if player:
-                #h = max(h, count_symbols(cell, d, player))
-                h += count_symbols(cell, d, player, 1)
+                invert_d = (d[0] * -1, d[1] * -1)
+                d_cell = get_delta_cell(cell, d)
+                invert_d_cell = get_delta_cell(cell, invert_d)
+                if self.is_on_board(d_cell) and self.get_cell(d_cell) == player and self.is_on_board(invert_d_cell) and self.get_cell(invert_d_cell) == player:
+                    h += count_symbols(cell, d, player, 1)
+                
+                else:
+                    h = max(h, count_symbols(cell, d, player, 1))
+                
+
             else:
                 player = start_of_line(cell, d)
                 if player:
-                    #h = max(h, count_symbols(cell, d, player))
-                    h += count_symbols(cell, d, player, 1)
+                    invert_d = (d[0] * -1, d[1] * -1)
+                    d_cell = get_delta_cell(cell, d)
+                    invert_d_cell = get_delta_cell(cell, invert_d)
+                    if self.is_on_board(d_cell) and self.get_cell(d_cell) == player and self.is_on_board(invert_d_cell) and self.get_cell(invert_d_cell) == player:
+                        h += count_symbols(cell, d, player, 1)
+                    
+                    else:
+                        h = max(h, count_symbols(cell, d, player, 1))
+
         return h
 
     def winning_length(self):
