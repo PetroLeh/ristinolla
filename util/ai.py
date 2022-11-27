@@ -39,6 +39,10 @@ class Minimax:
                 return move
         
         moves.sort(key=lambda move: self.h_map_max[move[0]][move[1]] + self.h_map_min[move[0]][move[1]], reverse=True)
+        
+        mh_min = self.find_max_heat(self.h_map_min)
+        mh_max = self.find_max_heat(self.h_map_max)
+        choose_to_defence = True if mh_min > mh_max else False
 
         best = -math.inf
         a = -math.inf
@@ -49,7 +53,9 @@ class Minimax:
         
         for move in moves:
             row, col = move
-            h = self.h_map_min[row][col] + self.h_map_max[row][col]
+
+            if choose_to_defence: h = self.h_map_min[row][col]
+            else: h = self.h_map_max[row][col]
 
             board.set_cell(move, self.maximizer)
             score = self.minmax(depth, board, moves, move, self.minimizer, a, b, evaluated_boards, False)
