@@ -9,8 +9,8 @@ class Minimax:
         self.minimizer = -player
         self.h_map_max = None
         self.h_map_min = None
-        self.mh_maximizer = 0
-        self.mh_minimizer = 0
+        self.mh_max = 0
+        self.mh_min= 0
         self.max_depth = max_depth
         self.counter = 0
 
@@ -26,8 +26,8 @@ class Minimax:
 
         self.h_map_max = board.heat_map2(self.maximizer)
         self.h_map_min = board.heat_map2(self.minimizer)
-        self.mh_maximizer = self.find_max_heat(self.h_map_max)
-        self.mh_minimizer = self.find_max_heat(self.h_map_min)
+        self.mh_max = self.find_max_heat(self.h_map_max)
+        self.mh_min = self.find_max_heat(self.h_map_min)
 
         for move in moves:
             if board.is_winning(move, self.maximizer):
@@ -40,9 +40,7 @@ class Minimax:
         
         moves.sort(key=lambda move: self.h_map_max[move[0]][move[1]] + self.h_map_min[move[0]][move[1]], reverse=True)
         
-        mh_min = self.find_max_heat(self.h_map_min)
-        mh_max = self.find_max_heat(self.h_map_max)
-        choose_to_defence = True if mh_min > mh_max else False
+        choose_to_defence = True if self.mh_min > self.mh_max else False
 
         best = -math.inf
         a = -math.inf
