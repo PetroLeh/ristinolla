@@ -10,3 +10,4 @@ board_size = 20
 winning_length = 5
 
 max_depth_in_minimax = 4
+ai_vs_ai = False

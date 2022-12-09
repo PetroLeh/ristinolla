@@ -14,6 +14,7 @@ class Minimax:
         self.max_depth = max_depth
         self.counter = 0
         self.use_of_dict = 0
+        self.logging = True
 
     def select_move(self, board):
 
@@ -68,14 +69,14 @@ class Minimax:
             if board.is_on_border(move): score -= 1
             a = max(a, score)
 
-            print(f'siirto: {move} pisteet: {score} h-arvo: {h}')
+            if self.logging: print(f'siirto: {move} pisteet: {score} h-arvo: {h}')
             if score > best:
                 best = score
                 best_move = move
         
         end = time.process_time()
         elapsed = end - start
-        motivate = "puolustava siirto" if choose_to_defence else "hyökkäävä siirto"
+        motivate = 'puolustava siirto' if choose_to_defence else 'hyökkäävä siirto'
 
         print()
         print(f'{motivate}: {best_move} minmax-kutsuja: {self.counter} kesto: {(elapsed):.3f} s (kesto / kutsu: ~{(elapsed*1000/self.counter):.3f} ms) hajautustaulun käyttö: {self.use_of_dict} kertaa')
@@ -153,7 +154,5 @@ class Minimax:
             print(s)
         print()
 
-    def print_heatmap(self, h_map):
-        for row in h_map:
-            s = " ".join(map(str, row))
-            print(s)
+    def set_logger_to(self, v: bool):
+        self.logging = v

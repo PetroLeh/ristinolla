@@ -15,6 +15,7 @@ def main():
         for arg in args:
             if arg in ['-t', '--text']: ui = tui
             if arg in ['-hm', '--heat_map']: config.heat_map = True
+            if arg == '-ai': config.ai_vs_ai = True
             if ':' in arg:
                 try:
                     s, wl = map(int, arg.split(':'))

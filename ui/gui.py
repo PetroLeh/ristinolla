@@ -12,13 +12,12 @@ player_one_color = config.player_one_color
 player_two_color = config.player_two_color
 cell_size = config.cell_size
 wall = config.wall_thickness
+
 hm = False
 
 def start(board):
     """ Käynnistää graafisen käyttöliittymän """
 
-    ai = Minimax(player_two, config.max_depth_in_minimax)
-        
     pygame.init()
 
     global width
@@ -26,6 +25,7 @@ def start(board):
     global hm
 
     hm = config.heat_map
+
     height = board.size() * (cell_size + wall) + 2 * wall
     width = int(height * 1.5) if hm else height
 
@@ -33,18 +33,29 @@ def start(board):
     pygame.display.set_caption('Ristinolla - vuorossa X')
 
     show(board, scene)
+    game_loop(scene, board)
+
+
+def game_loop(scene, board):
+    """ pelisilmukka """
 
     cell = None
     marked_cell = None
     move = None
     turn = player_one
     game_over = False
+    ai_vs_ai = config.ai_vs_ai
+    
+    ai_O = Minimax(player_two, config.max_depth_in_minimax)
+    if ai_vs_ai: ai_X = Minimax(player_one, config.max_depth_in_minimax)     
 
     while True:        
         if not game_over:
         
             if turn == player_two:
-                move = ai.select_move(board)
+                move = ai_O.select_move(board)
+            elif ai_vs_ai:
+                move = ai_X.select_move(board)
 
             for event in pygame.event.get():                
 
@@ -79,6 +90,8 @@ def start(board):
 
         else:
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
                 if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     game_over = False
                     move = None
@@ -87,7 +100,6 @@ def start(board):
                     pygame.display.set_caption('Ristinolla - vuorossa X')
 
                     show(board, scene)
-
 
 def show(board, scene):
     """ Piirtää peliruudukon """
