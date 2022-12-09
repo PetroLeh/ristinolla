@@ -15,6 +15,8 @@ wall = config.wall_thickness
 hm = False
 
 def start(board):
+    """ Käynnistää graafisen käyttöliittymän """
+
     ai = Minimax(player_two, config.max_depth_in_minimax)
         
     pygame.init()
@@ -39,7 +41,6 @@ def start(board):
     game_over = False
 
     while True:        
-        
         if not game_over:
         
             if turn == player_two:
@@ -83,10 +84,14 @@ def start(board):
                     move = None
                     turn = player_one
                     board.clear()
+                    pygame.display.set_caption('Ristinolla - vuorossa X')
 
                     show(board, scene)
-            
+
+
 def show(board, scene):
+    """ Piirtää peliruudukon """
+
     grid = board.grid()
     scene.fill((100, 100, 100))    
 
@@ -106,6 +111,9 @@ def show(board, scene):
     pygame.display.flip()
 
 def get_cell_from_coordinates(pos: tuple, board):
+    """ Laskee hiiren osoittimen koordinaateista
+    mikä peliruudukon ruutu sillä kohtaa on ja palauttaa sen """
+
     x, y = pos     
     col = int(x / (cell_size + wall))
     row = int(y / (cell_size + wall))
@@ -113,7 +121,6 @@ def get_cell_from_coordinates(pos: tuple, board):
     return (row, col)
 
 def show_winner(player, board, scene):
-
     if player == player_one:
         winner_color = player_one_color
         w = 'X'
@@ -127,29 +134,13 @@ def show_winner(player, board, scene):
     winner = big_font.render(f'Voittaja on {w}', True, winner_color, (200,200,200))
     new_game = small_font.render('aloita uusi peli painamalla jotain näppäintä', True, winner_color, (200,200,200))
 
-    box_size = 440
-    #pygame.draw.rect(scene, (100,100,100), (middle - int(box_size / 2), middle - int(box_size / 2), box_size, box_size))
-    #pygame.draw.rect(scene, (200,200,200), (middle - int(box_size / 2) + wall, middle - int(box_size / 2) + wall, box_size - 2 * wall, box_size - 2 * wall))
     scene.blit(winner, (middle - 120, middle - 120))
-
     scene.blit(new_game, (middle - 200, middle + 120))
-    
-    cs = cell_size * 2
-    # if player == player_one:
-    #     x = y = int(middle - cs / 2)
-
-    #     pygame.display.set_caption('Ristinolla - X voitti')
-    #     pygame.draw.line(scene, player_one_color, (x, y), (x + cs, y + cs), 4 * wall )
-    #     pygame.draw.line(scene, player_one_color, (x + cs, y), (x, y + cs), 4 * wall )
-
-    # else:
-    #     pygame.display.set_caption('Ristinolla - O voitti')
-    #     pygame.draw.circle(scene, player_two_color, (middle, middle), int(cs))
-    #     pygame.draw.circle(scene, (200,200,200), (middle, middle), int(cs - 5 * wall))
-    
     pygame.display.flip()
 
 def mark_cell(cell, color, scene):
+    """ Merkitsee klikatun ruudun valituksi """
+
     y, x = cell
     x *= (cell_size + wall)
     y *= (cell_size + wall)
@@ -166,7 +157,9 @@ def show_heat_maps(board, scene):
     show_heat_map_2(board, scene)
 
 def show_heat_map_1(board, scene):
-    heat_map = board.heat_map2(player_one)
+    """ Piirtää pelaajan X heatmapin """
+
+    heat_map = board.heat_map(player_one)
 
     scale = 2
     y = wall
@@ -180,7 +173,9 @@ def show_heat_map_1(board, scene):
         y += ((cell_size + wall) / scale)
 
 def show_heat_map_2(board, scene):
-    heat_map = board.heat_map2(player_two)
+    """ Piirtää pelaajan O heatmapin """
+
+    heat_map = board.heat_map(player_two)
 
     scale = 2
     y = int((2 * wall + board.size() * (cell_size + wall)) / 2)

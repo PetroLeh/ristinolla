@@ -10,22 +10,27 @@ class Minimax:
         self.h_map_max = None
         self.h_map_min = None
         self.mh_max = 0
-        self.mh_min= 0
+        self.mh_min = 0
         self.max_depth = max_depth
         self.counter = 0
+        self.use_of_dict = 0
 
     def select_move(self, board):
 
+        print()
         start = time.process_time()
 
         moves = self.heat_map_as_list(board.heat_map())
         if not moves and not board.is_full():
-            return self.select_random(board)
+            move = self.select_random(board)
+            print(f'satunnainen siirto: {move}')
+            return move
 
         self.counter = 0
 
-        self.h_map_max = board.heat_map2(self.maximizer)
-        self.h_map_min = board.heat_map2(self.minimizer)
+        self.h_map_min = board.heat_map(self.minimizer)
+        self.h_map_max = board.heat_map(self.maximizer)
+
         self.mh_max = self.find_max_heat(self.h_map_max)
         self.mh_min = self.find_max_heat(self.h_map_min)
 
@@ -52,8 +57,8 @@ class Minimax:
         for move in moves:
             row, col = move
 
-            if choose_to_defence: h = self.h_map_min[row][col]
-            else: h = self.h_map_max[row][col]
+            if choose_to_defence: h = self.h_map_max[row][col] + self.h_map_min[row][col] * 3
+            else: h = self.h_map_max[row][col] * 3 + self.h_map_min[row][col]
 
             board.set_cell(move, self.maximizer)
             score = self.minmax(depth, board, moves, move, self.minimizer, a, b, evaluated_boards, False)
@@ -70,14 +75,21 @@ class Minimax:
         
         end = time.process_time()
         elapsed = end - start
-        print(f'valittu siirto: {best_move} minmax-kutsuja: {self.counter} kesto: {(elapsed):.3f} s (kesto / kutsu: ~{(elapsed*1000/self.counter):.3f} ms)')
+        motivate = "puolustava siirto" if choose_to_defence else "hyökkäävä siirto"
+
+        print()
+        print(f'{motivate}: {best_move} minmax-kutsuja: {self.counter} kesto: {(elapsed):.3f} s (kesto / kutsu: ~{(elapsed*1000/self.counter):.3f} ms) hajautustaulun käyttö: {self.use_of_dict} kertaa')
         return best_move
 
     def minmax(self, depth, board, moves, move, turn, a, b, evaluated_boards, terminal):
 
         self.counter += 1
+        if board.key() in evaluated_boards:
+            self.use_of_dict += 1
+            return evaluated_boards[board.key()]
+
         if board.is_full() or depth == 0 or terminal:
-            score = self.evaluate(board, move)
+            score = self.evaluate(board, move, evaluated_boards)
             return score
 
         best = -math.inf if turn == self.maximizer else math.inf
@@ -105,10 +117,11 @@ class Minimax:
             if b <= a: break
         return best
 
-    def evaluate(self, board, move):
+    def evaluate(self, board, move, evaluated_boards):
         score = 0
         if board.middle() == self.maximizer: score += 1
-        if board.middle() == self.minimizer: score -= 1        
+        if board.middle() == self.minimizer: score -= 1
+        evaluated_boards[board.key()] = score 
         return score
 
     def find_max_heat(self, heat_map):
@@ -139,3 +152,8 @@ class Minimax:
             s = " ".join(map(lambda n: c[n], row))
             print(s)
         print()
+
+    def print_heatmap(self, h_map):
+        for row in h_map:
+            s = " ".join(map(str, row))
+            print(s)
