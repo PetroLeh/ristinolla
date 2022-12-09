@@ -15,6 +15,7 @@ class Minimax:
         self.counter = 0
         self.use_of_dict = 0
         self.logging = True
+        self.evaluated_boards = {}
 
     def select_move(self, board):
 
@@ -53,7 +54,6 @@ class Minimax:
         b = math.inf
         best_move = None
         depth = self.max_depth
-        evaluated_boards = {}
         
         for move in moves:
             row, col = move
@@ -62,7 +62,7 @@ class Minimax:
             else: h = self.h_map_max[row][col] * 3 + self.h_map_min[row][col]
 
             board.set_cell(move, self.maximizer)
-            score = self.minmax(depth, board, moves, move, self.minimizer, a, b, evaluated_boards, False)
+            score = self.minmax(depth, board, moves, move, self.minimizer, a, b, False)
             board.set_empty(move)
 
             score += h
@@ -82,15 +82,14 @@ class Minimax:
         print(f'{motivate}: {best_move} minmax-kutsuja: {self.counter} kesto: {(elapsed):.3f} s (kesto / kutsu: ~{(elapsed*1000/self.counter):.3f} ms) hajautustaulun käyttö: {self.use_of_dict} kertaa')
         return best_move
 
-    def minmax(self, depth, board, moves, move, turn, a, b, evaluated_boards, terminal):
-
+    def minmax(self, depth, board, moves, move, turn, a, b, terminal):
         self.counter += 1
-        if board.key() in evaluated_boards:
+        if board.key() in self.evaluated_boards:
             self.use_of_dict += 1
-            return evaluated_boards[board.key()]
+            return self.evaluated_boards[board.key()]
 
         if board.is_full() or depth == 0 or terminal:
-            score = self.evaluate(board, move, evaluated_boards)
+            score = self.evaluate(board, move)
             return score
 
         best = -math.inf if turn == self.maximizer else math.inf
@@ -103,14 +102,14 @@ class Minimax:
                 if board.is_winning(move, self.maximizer):
                     return 100 - depth
                 board.set_cell(move, self.maximizer)
-                score = self.minmax(depth - 1, board, moves, move, self.minimizer, a, b, evaluated_boards, terminal)
+                score = self.minmax(depth - 1, board, moves, move, self.minimizer, a, b, terminal)
                 best = max(best, score)
                 a = max(a, score)
             else:                
                 if board.is_winning(move, self.minimizer):
                     return -100 + depth
                 board.set_cell(move, self.minimizer)
-                score = self.minmax(depth - 1, board, moves, move, self.maximizer, a, b, evaluated_boards, terminal)
+                score = self.minmax(depth - 1, board, moves, move, self.maximizer, a, b, terminal)
                 best = min(best, score)
                 b = min(b, score)
             board.set_empty(move)
@@ -118,11 +117,11 @@ class Minimax:
             if b <= a: break
         return best
 
-    def evaluate(self, board, move, evaluated_boards):
+    def evaluate(self, board, move):
         score = 0
         if board.middle() == self.maximizer: score += 1
         if board.middle() == self.minimizer: score -= 1
-        evaluated_boards[board.key()] = score 
+        self.evaluated_boards[board.key()] = score 
         return score
 
     def find_max_heat(self, heat_map):
