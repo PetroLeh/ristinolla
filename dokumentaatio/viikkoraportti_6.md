@@ -1,8 +1,10 @@
 ### viikkoraportti
 #### viikko 6
 
-Projekti oli jonkin aikaa paitsiossa muiden töiden takia. Puolittain toimivan algoritmin ongelmana oli se, että se
-lähinnä rakenteli tilanteita, mutta ei sitten tehnyt voittaavaa suoraa selvästä tilanteesta. Lisäksi se oli erittäin hidas.
+Projekti oli jonkin aikaa paitsiossa muiden töiden takia.
+
+Puolittain toimivan algoritmin ongelmana oli se, että se lähinnä rakenteli tilanteita, mutta ei sitten tehnyt voittavaa suoraa selvästä tilanteesta.
+Lisäksi se oli erittäin hidas.
 
 Korjasin tuota 'jatkuvaa rakentelua' -ongelmaa ja tehostin algoritmia. En ole vain aivan varma teinkö sen "oikein" mitä tulee kurssin vaatimuksiin.
 En juurikaan koskenut itse minimax-algoritmiin, vähän siihenkin, mutta enimmäkseen tehostus tapahtui karsimalla ja tarkastamalla siirtovaihtoehtoja
