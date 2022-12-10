@@ -182,9 +182,9 @@ class Board:
                 return 1 + count_symbols(d_cell, d, player, symbols_counted + 1)
 
             # jos seuraavassa ruudussa ei ole pelaajan merkkiä, mutta ei myöskään vastustajan, lisätään vielä
-            # ekstrapiste mahdollisuudesta pelata tähän ruutuun
+            # puoli ekstrapistettä mahdollisuudesta pelata tähän ruutuun
             elif self.is_on_board(d_cell) and self.get_cell(d_cell) == 0 and symbols_counted:
-                return 1
+                return .5
             return 0
     
     # lasketaan eri suuntiin lähtevien suorien pituudet

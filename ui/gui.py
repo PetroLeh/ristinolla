@@ -45,9 +45,10 @@ def game_loop(scene, board):
     turn = player_one
     game_over = False
     ai_vs_ai = config.ai_vs_ai
+    max_depth = config.max_depth_in_minimax
 
-    ai_O = Minimax(player_two, config.max_depth_in_minimax)
-    if ai_vs_ai: ai_X = Minimax(player_one, config.max_depth_in_minimax)     
+    ai_O = Minimax(player_two, max_depth)
+    if ai_vs_ai: ai_X = Minimax(player_one, max_depth)     
 
     while True:        
         if not game_over:
