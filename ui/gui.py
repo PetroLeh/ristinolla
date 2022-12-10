@@ -48,7 +48,9 @@ def game_loop(scene, board):
     max_depth = config.max_depth_in_minimax
 
     ai_O = Minimax(player_two, max_depth)
-    if ai_vs_ai: ai_X = Minimax(player_one, max_depth)     
+    if ai_vs_ai: ai_X = Minimax(player_one, max_depth)
+
+    blop = pygame.mixer.Sound('util/sounds/blop.wav')
 
     while True:        
         if not game_over:
@@ -74,6 +76,7 @@ def game_loop(scene, board):
                         move = marked_cell if marked_cell == current_cell else remove_mark(marked_cell, scene)
 
             if move:
+                pygame.mixer.Sound.play(blop)
                 if board.set_cell(move, turn):
                     show(board, scene)
                     if board.is_winning(move, turn):
