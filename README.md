@@ -9,6 +9,8 @@
 - [viikkoraportti 2](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/viikkoraportti_2.md)
 - [viikkoraportti 3 (myöhässä)](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/viikkoraportti_3.md)
 - [viikkoraportti 4](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/viikkoraportti_4.md)
+- viikkoraportti 5 puuttuu
+- [viikkoraportti 6](https://github.com/PetroLeh/ristinolla/blob/master/dokumentaatio/viikkoraportti_6.md)
 
 ---
 
