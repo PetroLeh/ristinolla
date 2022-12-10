@@ -96,7 +96,7 @@ def game_loop(scene, board):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
-                if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONUP:
                     game_over = False
                     move = None
                     turn = player_one
