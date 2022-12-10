@@ -78,7 +78,7 @@ class Board:
     
     # apumetodeja voittosuoran tarkistamiseen
         
-        # haketaan suoran alkupiste tietyssä suunnassa
+        # haetaan suoran alkupiste tietyssä suunnassa
         def get_starting_point(move, direction, player):
             row, col = move
             row_dir, col_dir = direction
