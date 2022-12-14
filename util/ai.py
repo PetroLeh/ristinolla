@@ -60,10 +60,6 @@ class Minimax:
         # järjestetään siirtojen lista siten, että kärjessä on ne ruudut, joissa on pisimpien suorien päät
         moves.sort(key=lambda move: self.h_map_max[move[0]][move[1]] + self.h_map_min[move[0]][move[1]], reverse=True)
 
-        # karsitaan suoraan 'heikoimmat' ruudut pois
-        m_size = len(moves)
-        if m_size > 1: moves = moves[:m_size // 2]
-
         # jos vastustajalla on pidempää pätkää valitaan puolustava taktiikka, muutoin hyökkäävä
         choose_to_defence = True if self.mh_min > self.mh_max else False
 
@@ -72,7 +68,8 @@ class Minimax:
         b = math.inf
         best_move = moves[0]
         depth = self.max_depth
-        
+        is_terminal = False
+
         for move in moves:
             row, col = move
 
@@ -89,7 +86,7 @@ class Minimax:
 
             # siirto ei ole vielä osoittautunut voittavaksi tai välttämättömäksi puolustaa -> lasketaan sen arvo
             board.set_cell(move, self.maximizer)
-            score = self.minmax(depth, board, moves, move, self.minimizer, a, b, False)
+            score = self.minmax(depth, board, moves, move, self.minimizer, a, b, is_terminal)
             board.set_empty(move)
 
             # lisätään aiemmin laskettu puolustus/hyökkäys -arvo
@@ -113,10 +110,12 @@ class Minimax:
         print(f'({p_symbol}) {motivate}: {best_move} minmax-kutsuja: {self.counter} kesto: {(elapsed):.3f} s (kesto / kutsu: ~{(elapsed*1000/max(1, self.counter)):.3f} ms)')
         return best_move
 
-    def minmax(self, depth, board, moves, move, turn, a, b, terminal):
+    def minmax(self, depth, board, moves, move, turn, a, b, is_terminal):
+        
+        # laskurimuuttuja ei liity algoritmin toimintaa, vaan on ainoastaan lokeja varten.
         self.counter += 1
 
-        if board.is_full() or depth == 0 or terminal:
+        if board.is_full() or depth == 0 or is_terminal:
             return 0
 
         best = -math.inf if turn == self.maximizer else math.inf
@@ -124,21 +123,23 @@ class Minimax:
         for i, move in enumerate(moves):
             if not board.is_empty(move): continue
 
-            terminal = i == len(moves) - 1
+            is_terminal = i == len(moves) - 1
             if turn == self.maximizer:
                 row, col = move
-                if self.h_map_max[row][col] > 3: return 10
-
-                board.set_cell(move, self.maximizer)
-                score = self.minmax(depth - 1, board, moves, move, self.minimizer, a, b, terminal)
+                if self.h_map_max[row][col] > 3:                   
+                    score = 10
+                else:
+                    board.set_cell(move, self.maximizer)
+                    score = self.minmax(depth - 1, board, moves, move, self.minimizer, a, b, is_terminal)
                 best = max(best, score)
                 a = max(a, score)
             else:                
                 row, col = move
-                if self.h_map_min[row][col] > 3: return -10
-
-                board.set_cell(move, self.minimizer)
-                score = self.minmax(depth - 1, board, moves, move, self.maximizer, a, b, terminal)
+                if self.h_map_min[row][col] > 3: 
+                    score =  -10
+                else:
+                    board.set_cell(move, self.minimizer)
+                    score = self.minmax(depth - 1, board, moves, move, self.maximizer, a, b, is_terminal)
                 best = min(best, score)
                 b = min(b, score)
             board.set_empty(move)

@@ -24,7 +24,7 @@ characters = {0: ".",
              -1: "O"
             }
 
-# graafisen käyttöliittymän määrittelyjä
+# graafisen käyttöliittymän määrittelyjä:
 
 # näytetäänkö heatmapit
 heat_map = False

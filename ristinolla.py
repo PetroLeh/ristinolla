@@ -29,7 +29,6 @@ def main():
                 config.ai_vs_ai = True
                 config.is_test_run = True
 
-
     if winning_length > board_size: winning_length = board_size
     board = Board(board_size, winning_length)
     ui.start(board)
