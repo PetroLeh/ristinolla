@@ -1,5 +1,5 @@
 import pygame
-from util.ai import Minimax
+from util.ai import Minimax as Minimax
 import util.config as config
 
 width = 0
@@ -10,9 +10,8 @@ player_two = -1
 
 player_one_color = config.player_one_color
 player_two_color = config.player_two_color
-cell_size = config.cell_size
-wall = config.wall_thickness
-
+cell_size = config.CELL_SIZE
+wall = config.WALL_THICKNESS
 hm = False
 
 def start(board):
@@ -24,7 +23,7 @@ def start(board):
     global height
     global hm
 
-    hm = config.heat_map
+    hm = config.HEAT_MAP
 
     height = board.size() * (cell_size + wall) + 2 * wall
     width = int(height * 1.5) if hm else height
@@ -33,10 +32,10 @@ def start(board):
     pygame.display.set_caption('Ristinolla - vuorossa X')
 
     show(board, scene)
-    game_loop(scene, board)
+    game_loop(board, scene)
 
 
-def game_loop(scene, board):
+def game_loop(board, scene):
     """ pelisilmukka """
 
     cell = None
@@ -44,9 +43,9 @@ def game_loop(scene, board):
     move = None
     turn = player_one
     game_over = False
-    ai_vs_ai = config.ai_vs_ai
-    max_depth = config.max_depth_in_minimax
-
+    ai_vs_ai = config.AI_VS_AI
+    max_depth = config.MAX_DEPTH_IN_MINIMAX
+    
     ai_O = Minimax(player_two, max_depth)
     if ai_vs_ai: ai_X = Minimax(player_one, max_depth)
 
@@ -80,7 +79,7 @@ def game_loop(scene, board):
                 if board.set_cell(move, turn):
                     show(board, scene)
                     if board.is_winning(move, turn):
-                        show_winner(turn, board, scene)
+                        show_winner(turn, move, board, scene)
                         game_over = True
                     if board.is_full():
                         pygame.display.set_caption('Ristinolla - tasapeli')
@@ -136,22 +135,38 @@ def get_cell_from_coordinates(pos: tuple, board):
 
     return (row, col)
 
-def show_winner(player, board, scene):
+def show_winner(player, move, board, scene):
     if player == player_one:
         winner_color = player_one_color
         w = 'X'
     else:
         winner_color = player_two_color
         w = 'O'
+    
+    pygame.display.set_caption(f'Voittaja on {w}')
 
     middle = int(height / 2)
-    big_font = pygame.font.SysFont('Arial', 48)
-    small_font = pygame.font.SysFont('Arial', 22)
-    winner = big_font.render(f'Voittaja on {w}', True, winner_color, (200,200,200))
-    new_game = small_font.render('aloita uusi peli painamalla jotain näppäintä', True, winner_color, (200,200,200))
 
-    scene.blit(winner, (middle - 120, middle - 120))
-    scene.blit(new_game, (middle - 200, middle + 120))
+    font = pygame.font.SysFont('Arial', 22)
+    winner = font.render(f'Voittaja on {w}', True, winner_color, (200,200,200))
+    new_game = font.render('aloita uusi peli painamalla jotain näppäintä', True, winner_color, (200,200,200))
+
+    line_start_y, line_start_x = board.winning_line['start']
+    line_direction_y, line_direction_x = board.winning_line['direction']
+    line_length = board.winning_length()
+
+    line_start_x *= (cell_size + wall)
+    line_start_x += (wall + cell_size // 2)
+    line_start_y *= (cell_size + wall)
+    line_start_y += (wall + cell_size // 2)
+
+    line_end_x = line_start_x + (line_direction_x * (cell_size + wall) * (line_length - 1))
+    line_end_y = line_start_y + (line_direction_y * (cell_size + wall) * (line_length - 1))
+
+    pygame.draw.line(scene, winner_color, (line_start_x, line_start_y), (line_end_x, line_end_y), wall*3)
+
+    scene.blit(winner, (middle - 80, 20))
+    scene.blit(new_game, (middle - 200, 60))
     pygame.display.flip()
 
 def mark_cell(cell, color, scene):

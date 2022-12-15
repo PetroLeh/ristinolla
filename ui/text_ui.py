@@ -2,12 +2,12 @@
 import util.config as config
 from util.ai import Minimax
 
-c = config.characters
+c = config.CHARACTERS
 
 def start(board):
 
-    ai_vs_ai = config.ai_vs_ai
-    max_depth = config.max_depth_in_minimax
+    ai_vs_ai = config.AI_VS_AI
+    max_depth = config.MAX_DEPTH_IN_MINIMAX
 
     player_one = 1
     player_two = -1

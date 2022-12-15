@@ -8,14 +8,14 @@ import util.config as config
 def main():
     args = sys.argv[1:]
     ui = gui
-    board_size = config.board_size
-    winning_length = config.winning_length
+    board_size = config.BOARD_SIZE
+    winning_length = config.WINNING_LENGTH
 
     if args:
         for arg in args:
             if arg in ['-t', '--text']: ui = tui
-            if arg in ['-hm', '--heat_map']: config.heat_map = True
-            if arg == '-ai': config.ai_vs_ai = True
+            if arg in ['-hm', '--heat_map']: config.HEAT_MAP = True
+            if arg == '-ai': config.AI_VS_AI = True
             if ':' in arg:
                 try:
                     s, wl = map(int, arg.split(':'))
@@ -26,8 +26,8 @@ def main():
 
             # seuraavaa ominaisuutta ei ole vielä toteutettu
             if arg == '--test_run':
-                config.ai_vs_ai = True
-                config.is_test_run = True
+                config.AI_VS_AI = True
+                config.IS_TEST_RUN = True
 
     if winning_length > board_size: winning_length = board_size
     board = Board(board_size, winning_length)

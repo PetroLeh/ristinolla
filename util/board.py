@@ -1,37 +1,39 @@
 class Board:
-    
+
     def __init__(self, size: int, winning_length: int):
         row = [0 for i in range(size)]
         self.__grid = [row[:] for i in range(size)]
         self.__winning_length = winning_length
-    
+        self.winning_line = {}
+
     def key(self):
         """ Muodostaa laudasta merkkijonoesityksen """
 
-        s = ''
+        key = ''
         for row in self.__grid:
             if 1 in row or -1 in row:
-                r = ''.join(map(str, row))
+                row_string = ''.join(map(str, row))
             else:
-                r = 'e'
-            s += r
-        return s
+                row_string = 'e'
+            key += row_string
+        return key
 
     def grid(self):
         """ Palauttaa pelitilanteen taulukkona """
 
         return self.__grid
-    
+
     def middle(self):
         """ Palauttaa keskimmäisen ruudun merkin """
 
         return self.__grid[self.size() // 2][self.size() // 2]
-    
+
     def get_cell(self, cell: tuple):
         """ Palauttaa argumenttina saadun ruudun merkin """
 
         row, col = cell
-        if self.is_on_board(cell): return self.__grid[row][col]
+        if self.is_on_board(cell):
+            return self.__grid[row][col]
         return 0
 
     def set_cell(self, cell: tuple, player):
@@ -39,26 +41,29 @@ class Board:
 
         palauttaa True jos merkintä on sallittu, muuten palautta False """
 
-        if not cell: return False
+        if not cell:
+            return False
         row, col = cell
         if self.is_on_board(cell) and self.__grid[row][col] == 0:
             self.__grid[row][col] = player
             return True
         return False
-   
+
     def is_empty(self, cell: tuple):
         """ Tarkistaa onko argumenttina saatu ruutu tyhjä """
 
-        if not self.is_on_board(cell): return False
-        row, col = cell        
+        if not self.is_on_board(cell):
+            return False
+        row, col = cell
         return self.__grid[row][col] == 0
-    
+
     def set_empty(self, cell: tuple):
         """ Merkitsee argumenttina saadun ruudun tyhjäksi """
 
         row, col = cell
-        if self.is_on_board(cell): self.__grid[row][col] = 0
-    
+        if self.is_on_board(cell):
+            self.__grid[row][col] = 0
+
     def clear(self):
         """ Tyhjentää pelilaudan """
 
@@ -74,10 +79,11 @@ class Board:
     def is_winning(self, move: tuple, player):
         """ Tarkistaa muodostaako argumenttina saatu siirto voittavan suoran pelialueelle """
 
-        if move == None: return False
-    
+        if not move:
+            return False
+
     # apumetodeja voittosuoran tarkistamiseen
-        
+
         # haetaan suoran alkupiste tietyssä suunnassa
         def get_starting_point(move, direction, player):
             row, col = move
@@ -85,8 +91,7 @@ class Board:
             new_row, new_col = (row + row_dir, col + col_dir)
             if self.is_on_board((new_row, new_col)) and self.__grid[new_row][new_col] == player:
                 return get_starting_point((new_row, new_col), direction, player)
-            else:
-                return (row, col)
+            return (row, col)
 
         # käännetään suunta
         def invert(direction: tuple):
@@ -95,12 +100,11 @@ class Board:
         # lasketaan suoran pituus tiettyyn suuntaan
         def line_length(start: tuple, direction: tuple, player):
             row, col = start
-            row_dir, col_dir = direction   
+            row_dir, col_dir = direction
             new_row, new_col = (row + row_dir, col + col_dir)
             if self.is_on_board((new_row, new_col)) and (self.__grid[new_row][new_col] == player or (new_row, new_col) == move):
                 return 1 + line_length((new_row, new_col), direction, player)
-            else:
-                return 1              
+            return 1
 
     # käydään läpi annetun siirron koordinaateista joka suuntaan kulkevien samaa merkkiä sisältävien
     # suorien pituudet ja tarkistetaan onko pituus vähintään voittoon tarvittava
@@ -108,7 +112,9 @@ class Board:
         for direction in directions:
             start = get_starting_point(move, direction, player)
             inv_direction = invert(direction)
-            if line_length(start, inv_direction, player) >= self.__winning_length:                
+            if line_length(start, inv_direction, player) >= self.__winning_length:
+                self.winning_line['start'] = start
+                self.winning_line['direction'] = inv_direction
                 return True
         return False
 
@@ -120,13 +126,14 @@ class Board:
             if 0 in row:
                 return False
         return True
-    
+
     def heat_map(self, player=None):
-        """ Palauttaa taulukon, jonka solujen arvoina on pelilaudalla kyseisessä koordinaatissa
-        olevan ruudun 'kuumuus'. Jos argumenttina ei ole annettu pelaajaa, Kuumuus määräytyy sen mukaan,
-        kuinka moneen naapuriruutuun on pelattu kumman tahansa pelaajan merkki. Jos argumenttina on annettu
-        pelaaja, kuumuus määräytyy sen mukaan mikä on pisin kyseisen ruudun vierestä lähtevä pelaajan merkkejä
-        sisältävä suora """
+        """ Palauttaa taulukon, jonka solujen arvoina on pelilaudalla kyseisessä
+        koordinaatissa olevan ruudun 'kuumuus'. Jos argumenttina ei ole annettu
+        pelaajaa, kuumuus määräytyy sen mukaan, kuinka moneen naapuriruutuun on
+        pelattu kumman tahansa pelaajan merkki. Jos argumenttina on annettu
+        pelaaja, kuumuus määräytyy sen mukaan mikä on pisin kyseisen ruudun
+        vierestä lähtevä pelaajan merkkejä sisältävä suora """
 
         row = [0 for i in range(self.size())]
         heat_map = [row[:] for i in range(self.size())]
@@ -134,76 +141,82 @@ class Board:
             for row in range(self.size()):
                 for col in range(self.size()):
                     cell = (row, col)
-                    if self.is_empty(cell): heat_map[row][col] = self.heat2(cell, player)
-                    else: heat_map[row][col] = 0
-            return heat_map        
-        else:
-            for row in range(self.size()):
-                for col in range(self.size()):
-                    cell = (row, col)
-                    if self.is_empty(cell): heat_map[row][col] = self.heat(cell)
-                    else: heat_map[row][col] = 0
+                    if self.is_empty(cell):
+                        heat_map[row][col] = self.heat2(cell, player)
+                    else:
+                        heat_map[row][col] = 0
             return heat_map
-    
-    def heat(self, cell: tuple):
-        """ Palauttaa argumenttina saadun ruudun vieressä (kaikkiin suuntiin) olevien merkkien määrän """
 
-        h = 0
+        for row in range(self.size()):
+            for col in range(self.size()):
+                cell = (row, col)
+                if self.is_empty(cell):
+                    heat_map[row][col] = self.heat(cell)
+                else:
+                    heat_map[row][col] = 0
+        return heat_map
+
+    def heat(self, cell: tuple):
+        """ Palauttaa argumenttina saadun ruudun vieressä (kaikkiin suuntiin)
+        olevien merkkien määrän """
+
+        heat = 0
         surrounding_cells = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
         row, col = cell
-        for c in surrounding_cells:
-            delta_row, delta_col = c
+        for d_cell in surrounding_cells:
+            delta_row, delta_col = d_cell
             new_row = row + delta_row
             new_col = col + delta_col
             if self.is_on_board((new_row, new_col)) and not self.is_empty((new_row, new_col)):
-                h += 1
-        return h
+                heat += 1
+        return heat
 
     def heat2(self, cell: tuple, player):
-        """ Palauttaa argumenttina saadun ruudun vierestä lähtevien tietyn pelaajan merkkejä sisältävien
-        suorien suurimman pituuden """
-    
+        """ Palauttaa argumenttina saadun ruudun vierestä lähtevien tietyn
+        pelaajan merkkejä sisältävien suorien suurimman pituuden """
+
     # apumetodeja suoran pituuden laskemiseen
 
         # palautetaan seuraavan ruudun koordinaatit
-        def get_delta_cell(c, d):
-            row, col = c
-            delta_row, delta_col = d
+        def get_delta_cell(cell, direction):
+            row, col = cell
+            delta_row, delta_col = direction
             new_row = row + delta_row
             new_col = col + delta_col
             return (new_row, new_col)
 
         # lasketaan suorassa olevat merkit
-        def count_symbols(c, d, player, symbols_counted):
-            d_cell = get_delta_cell(c, d)
+        def count_symbols(cell, direction, player, symbols_counted):
+            d_cell = get_delta_cell(cell, direction)
 
-            # jos seuraavassa ruudussa on pelaajan merkki, lisätään 1 ja jatketaan laskemista eteenpäin
+            # jos seuraavassa ruudussa on pelaajan merkki, lisätään 1 ja jatketaan
+            # laskemista eteenpäin
             if self.is_on_board(d_cell) and self.get_cell(d_cell) == player:
-                return 1 + count_symbols(d_cell, d, player, symbols_counted + 1)
+                return 1 + count_symbols(d_cell, direction, player, symbols_counted + 1)
 
-            # jos seuraavassa ruudussa ei ole pelaajan merkkiä, mutta ei myöskään vastustajan, lisätään vielä
-            # puoli ekstrapistettä mahdollisuudesta pelata tähän ruutuun
-            elif self.is_on_board(d_cell) and self.get_cell(d_cell) == 0 and symbols_counted:
+            # jos seuraavassa ruudussa ei ole pelaajan merkkiä, mutta ei myöskään vastustajan,
+            # lisätään vielä puoli ekstrapistettä mahdollisuudesta pelata tähän ruutuun
+            if self.is_on_board(d_cell) and self.get_cell(d_cell) == 0 and symbols_counted:
                 return .5
             return 0
-    
+
     # lasketaan eri suuntiin lähtevien suorien pituudet
-        h = 0
+        length = 0
         directions = [(1, 1), (1, -1), (0, 1), (1, 0),
                       (-1, -1), (-1, 1), (0, -1), (-1, 0)]
-        for d in directions:
-                invert_d = (d[0] * -1, d[1] * -1)
-                d_cell = get_delta_cell(cell, d)
-                invert_d_cell = get_delta_cell(cell, invert_d)
+        for direction in directions:
+            invert_direction = (direction[0] * -1, direction[1] * -1)
+            delta_cell = get_delta_cell(cell, direction)
+            invert_d_cell = get_delta_cell(cell, invert_direction)
 
-                # tarkastetaan onko ruutu kahden samansuuntaisen suoran välissä
-                if self.is_on_board(d_cell) and self.get_cell(d_cell) == player and self.is_on_board(invert_d_cell) and self.get_cell(invert_d_cell) == player:
-                    # jos on, lasketaan molempien suorien pituus mukaan
-                    h = max(h, count_symbols(cell, d, player, 0) + count_symbols(cell, invert_d, player, 0))                
-                else:
-                    # jos ei, lasketaan yhteen suuntaan lähtevän suoran pituus
-                    h = max(h, count_symbols(cell, d, player, 0))
-        return h
+            # tarkastetaan onko ruutu kahden samansuuntaisen suoran välissä
+            if self.is_on_board(delta_cell) and self.get_cell(delta_cell) == player and self.is_on_board(invert_d_cell) and self.get_cell(invert_d_cell) == player:
+                # jos on, lasketaan molempien suorien pituus mukaan
+                length = max(length, count_symbols(cell, direction, player, 0) + count_symbols(cell, invert_direction, player, 0))
+            else:
+                # jos ei, lasketaan yhteen suuntaan lähtevän suoran pituus
+                length = max(length, count_symbols(cell, direction, player, 0))
+        return length
 
     def winning_length(self):
         return self.__winning_length
@@ -213,4 +226,3 @@ class Board:
 
         row, col = cell
         return row == 0 or col == 0 or row == self.size() - 1 or col == self.size() - 1
-        
