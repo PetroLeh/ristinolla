@@ -41,13 +41,12 @@ def game_loop(board, scene):
     cell = None
     marked_cell = None
     move = None
-    turn = player_one
+    turn = player_two
     game_over = False
     ai_vs_ai = config.AI_VS_AI
-    max_depth = config.MAX_DEPTH_IN_MINIMAX
-    
-    ai_O = Minimax(player_two, max_depth)
-    if ai_vs_ai: ai_X = Minimax(player_one, max_depth)
+
+    ai_O = Minimax(player_two)
+    if ai_vs_ai: ai_X = Minimax(player_one)
 
     blop = pygame.mixer.Sound('util/sounds/blop.wav')
 
@@ -81,7 +80,7 @@ def game_loop(board, scene):
                     if board.is_winning(move, turn):
                         show_winner(turn, move, board, scene)
                         game_over = True
-                    if board.is_full():
+                    elif board.is_full():
                         pygame.display.set_caption('Ristinolla - tasapeli')
                         game_over = True
                         turn = player_one                        

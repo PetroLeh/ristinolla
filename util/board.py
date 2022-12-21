@@ -4,19 +4,36 @@ class Board:
         row = [0 for i in range(size)]
         self.__grid = [row[:] for i in range(size)]
         self.__winning_length = winning_length
+        self.__move_table = self.init_move_table(size)
+        self.__moves_made = []
         self.winning_line = {}
 
-    def key(self):
-        """ Muodostaa laudasta merkkijonoesityksen """
 
-        key = ''
-        for row in self.__grid:
-            if 1 in row or -1 in row:
-                row_string = ''.join(map(str, row))
-            else:
-                row_string = 'e'
-            key += row_string
-        return key
+    def init_move_table(self, size):
+        """ luo taulukon, josta jokaiselle siirrolle saa
+        haettua lukuarvon """
+
+        table = []
+        for row in range(size):
+            table_row = []
+            for col in range(size * 2):
+                table_row.append(row * 2 * size + col)
+            table.append(table_row)
+        return table
+
+    def get_key(self):
+        return ''.join(map(str, self.__moves_made))
+
+    def get_move_key(self, move, player):
+        """ palauttaa siirron lukuarvon taulukosta """
+
+        row, col = move
+
+        # jos pelaaja on -1 offset on 0 eli haetaan arvo taulukon vasemmalta
+         # puolelta, jos pelaaja on 1 haetaan arvo taulukon oikealta puolelta
+        offset = (player + 1) // 2
+
+        return self.__move_table[row][col + (offset * len(self.__grid))]
 
     def grid(self):
         """ Palauttaa pelitilanteen taulukkona """
@@ -46,6 +63,8 @@ class Board:
         row, col = cell
         if self.is_on_board(cell) and self.__grid[row][col] == 0:
             self.__grid[row][col] = player
+            self.__moves_made.append(self.get_move_key(cell, player))
+            self.__moves_made.sort()
             return True
         return False
 
@@ -62,6 +81,9 @@ class Board:
 
         row, col = cell
         if self.is_on_board(cell):
+            if self.is_empty(cell):
+                return
+            self.__moves_made.remove(self.get_move_key(cell, self.__grid[row][col]))
             self.__grid[row][col] = 0
 
     def clear(self):

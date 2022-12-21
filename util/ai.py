@@ -1,4 +1,3 @@
-from random import randint
 import math
 import time
 
@@ -6,34 +5,31 @@ from util import config
 
 class Minimax:
 
-    def __init__(self, player, max_depth):
+    def __init__(self, player):
         self.maximizer = player
         self.minimizer = -player
         self.h_map_max = None
         self.h_map_min = None
-        self.max_depth = max_depth
         self.counter = 0
-        self.logging = True
+        self.board_size = 0
 
     def select_move(self, board):
         """ Valitsee parhaan siirron tietyssä pelitilanteessa. Jos peliruudukko on tyhjä, valitaan
         satunnainen ruutu peliruudukon keskialueelta. Muussa tapauksessa valitaan ruutu jo
         pelattujen ruutujen viereisistä ruuduista. """
 
+        self.counter = 0
+        self.board_size = board.size()
+
         # haetaan pelaajien tekstisymbolit tulostusta varten
         p_symbol = config.CHARACTERS[self.maximizer]
-
-        print()
-        start = time.process_time()
 
         # haetaan lista peliruuduista, joiden viereen on pelattu
         moves = self.heat_map_as_list(board.heat_map())
         if not moves and not board.is_full():
-            move = self.select_random(board)
-            print(f'({p_symbol}) satunnainen siirto: {move}')
+            move = (board.size() // 2, board.size() // 2)
+            print(f'({p_symbol}) ensimmäinen siirto: {move}')
             return move
-
-        self.counter = 0
 
         # tutkitaan kummankin pelaajan suoranpätkien pituuksia ja haetaan pisimpiä
         self.h_map_min = board.heat_map(self.minimizer)
@@ -55,99 +51,117 @@ class Minimax:
 
         # järjestetään siirtojen lista siten, että kärjessä on ne ruudut, joissa
         # on pisimpien suorien päät
-        moves.sort(key=lambda move: self.h_map_max[move[0]][move[1]] + self.h_map_min[move[0]][move[1]], reverse=True)
+        if mh_min > mh_max:
+            moves.sort(key=lambda move: self.h_map_min[move[0]][move[1]])
+        elif mh_min < mh_max:
+            moves.sort(key=lambda move: self.h_map_max[move[0]][move[1]])
+        else:
+            moves.sort(key=lambda move: self.h_map_min[move[0]][move[1]]
+                                      + self.h_map_max[move[0]][move[1]])
 
-        # jos vastustajalla on pidempää pätkää valitaan puolustava taktiikka, muutoin hyökkäävä
-        choose_to_defence = mh_min > mh_max
+        best_move = moves[-1]
 
-        best = -math.inf
-        alpha = -math.inf
-        beta = math.inf
+        for depth in range(3, 12):
+            best = -math.inf
+            alpha = -math.inf
+            beta = math.inf
+            evaluated_boards = {}
+            start = time.process_time()
+            print(f'syvyys: {depth}')
 
-        for move in moves:
-            row, col = move
+            for move in moves[::-1]:
 
-            # jos on valittu puolustuslinja, painotetaan ruutuja, joissa on
-            # vastustajan suorien päät...
-            if choose_to_defence:
-                heat = self.h_map_max[row][col] + self.h_map_min[row][col] * 3
+                # lisätään uuden siirron vierusruudut listaan
+                next_moves = self.add_adjacent_cells(move, moves)
 
-            # ...muuten painotetaan omia suoria
-            # jos saadaan muodostettua suora, joka on 4 mittainen tai avoin 3 palautetaan se
-            else:
-                if self.h_map_max[row][col] > 3:
-                    print(f'({p_symbol}) hyökkäävä siirto: {move}')
-                    return move
-                heat = self.h_map_max[row][col] * 3 + self.h_map_min[row][col]
+                # siirto ei ole vielä osoittautunut voittavaksi tai välttämättömäksi
+                # puolustaa -> lasketaan sen arvo
 
-            # siirto ei ole vielä osoittautunut voittavaksi tai välttämättömäksi
-            # puolustaa -> lasketaan sen arvo
-            board.set_cell(move, self.maximizer)
-            score = self.minmax(self.max_depth, board, moves, self.minimizer, alpha, beta, False)
-            board.set_empty(move)
+                board.set_cell(move, self.maximizer)
+                score = self.minmax(depth, board, next_moves, self.minimizer, alpha, beta, evaluated_boards)
+                board.set_empty(move)
+                print(f'siirto: {move} pisteet: {score}')
+                if score > best:
+                    best = score
+                    best_move = move
+                alpha = max(alpha, score)
 
-            # lisätään aiemmin laskettu puolustus/hyökkäys -arvo
-            score += heat
+            moves.remove(best_move)
+            moves.append(best_move)
 
-            # vähennetään vielä piste, jos ruutu on aivan laudan reunalla
-            if board.is_on_border(move):
-                score -= 1
-
-            alpha = max(alpha, score)
-
-            if self.logging:
-                print(f'({p_symbol}) siirto: {move} pisteet: {score} h-arvo: {heat}')
-            if score > best:
-                best = score
-                best_move = move
-
-        end = time.process_time()
-        elapsed = end - start
-        motivate = 'puolustava siirto' if choose_to_defence else 'hyökkäävä siirto'
+            end = time.process_time()
+            elapsed = end - start
+            print(f'laskennan kesto: {elapsed:.3f}')
+            if elapsed > 2:
+                break
 
         print()
-        print(f'({p_symbol}) {motivate}: {best_move} minmax-kutsuja: {self.counter} ', end ="")
+        print(f'({p_symbol}): {best_move} syvyys: {depth} minmax-kutsuja: {self.counter} ', end ="")
         print(f'kesto: {(elapsed):.3f}s kesto/kutsu: ~{(elapsed*1000/max(1, self.counter)):.3f}ms')
         return best_move
 
-    def minmax(self, depth, board, moves, turn, alpha, beta, is_terminal):
+    def minmax(self, depth, board, moves, turn, alpha, beta, evaluated_boards):
 
-        # laskurimuuttuja ei liity algoritmin toimintaa, vaan on ainoastaan lokeja varten.
+        # laskurimuuttuja ei liity algoritmin toimintaan, vaan on ainoastaan lokeja varten.
         self.counter += 1
 
-        if board.is_full() or depth <= 0 or is_terminal:
+        board_key = board.get_key()
+        if board_key in evaluated_boards:
+            if evaluated_boards[board_key][0] == depth:
+                return evaluated_boards[board_key][1]
+
+        if depth <= 0:
             return 0
 
-        best = -math.inf if turn == self.maximizer else math.inf
-
-        for i, move in enumerate(moves):
-            if not board.is_empty(move):
-                continue
-
-            is_terminal = i == len(moves) - 1
-            if turn == self.maximizer:
-                row, col = move
-                if self.h_map_max[row][col] > 3:
-                    score = 10
+        if turn == self.maximizer:
+            score = -math.inf
+            for move in moves[::-1]:
+                if not board.is_empty(move):
+                    continue
+                if board.is_winning(move, self.maximizer):
+                    score = math.inf
                 else:
                     board.set_cell(move, self.maximizer)
-                    score = self.minmax(depth - 1, board, moves, self.minimizer, alpha, beta, is_terminal)
-                best = max(best, score)
+                    next_moves = self.add_adjacent_cells(move, moves)
+                    score = max(score, self.minmax(depth - 1, board, next_moves, self.minimizer, alpha, beta, evaluated_boards))
+                    board.set_empty(move)
+                if score >= beta:
+                    break
                 alpha = max(alpha, score)
-            else:
-                row, col = move
-                if self.h_map_min[row][col] > 3:
-                    score = -10
+        else:
+            score = math.inf
+            for move in moves[::-1]:
+                if not board.is_empty(move):
+                    continue                
+                if board.is_winning(move, self.minimizer):
+                    score = -math.inf
                 else:
                     board.set_cell(move, self.minimizer)
-                    score = self.minmax(depth - 1, board, moves, self.maximizer, alpha, beta, is_terminal)
-                best = min(best, score)
+                    next_moves = self.add_adjacent_cells(move, moves)
+                    score = min(score, self.minmax(depth - 1, board, next_moves, self.maximizer, alpha, beta, evaluated_boards))
+                    board.set_empty(move)
+                if score <= alpha:
+                    break
                 beta = min(beta, score)
-            board.set_empty(move)
 
-            if beta <= alpha:
-                break
-        return best
+        evaluated_boards[board_key] = (depth, score)
+        return score
+
+    def add_adjacent_cells(self, move, moves):
+        moves_copy = moves.copy()
+        moves_copy.remove(move)
+
+        m_row, m_col = move
+
+        rows = range(max(0, m_row - 1), min(self.board_size, m_row + 1))
+        cols = range(max(0, m_col - 1), min(self.board_size, m_col + 1))
+
+        for row in rows:
+            for col in cols:
+                if row == m_row and col == m_col:
+                    continue
+                moves_copy.append((row, col))
+        return moves_copy
 
     def find_max_heat(self, heat_map):
         max_heat = 0
@@ -163,18 +177,3 @@ class Minimax:
                 if heat_map[row][col] > 0:
                     res.append((row, col))
         return res
-
-    def select_random(self, board):
-        min_val, max_val = self.get_bounds_for_random_move(board)
-        row = randint(min_val, max_val)
-        col = randint(min_val, max_val)
-        return (row, col)
-
-    def get_bounds_for_random_move(self, board):
-        middle = board.size() // 2
-        min_val = middle - middle // 2
-        max_val = middle + middle // 2
-        return (min_val, max_val)
-
-    def set_logger_to(self, value: bool):
-        self.logging = value

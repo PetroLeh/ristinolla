@@ -16,9 +16,6 @@ BOARD_SIZE = 20
 # voittoon vaadittava suoran pituus
 WINNING_LENGTH = 5
 
-# maksimi syvyys minimax-algoritmissa
-MAX_DEPTH_IN_MINIMAX = 6
-
 # pelaajien (ja tyhjän ruudun) tekstisymbolit
 CHARACTERS = {0: ".",
               1: "X",

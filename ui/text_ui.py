@@ -7,15 +7,14 @@ c = config.CHARACTERS
 def start(board):
 
     ai_vs_ai = config.AI_VS_AI
-    max_depth = config.MAX_DEPTH_IN_MINIMAX
 
     player_one = 1
     player_two = -1
 
     turn = player_one
-    ai_O = Minimax(player_two, max_depth)
+    ai_O = Minimax(player_two)
     if ai_vs_ai: 
-        ai_X = Minimax(player_one, max_depth)
+        ai_X = Minimax(player_one)
         ai_X.set_logger_to(False)
         ai_O.set_logger_to(False)
 
