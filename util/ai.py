@@ -12,6 +12,7 @@ class Minimax:
         self.h_map_min = None
         self.counter = 0
         self.board_size = 0
+        self.__logger = True
 
     def select_move(self, board):
         """ Valitsee parhaan siirron tietyssä pelitilanteessa. Jos peliruudukko on tyhjä, valitaan
@@ -23,6 +24,7 @@ class Minimax:
 
         # haetaan pelaajien tekstisymbolit tulostusta varten
         p_symbol = config.CHARACTERS[self.maximizer]
+        print(f'vuorossa: {p_symbol}')
 
         # haetaan lista peliruuduista, joiden viereen on pelattu
         moves = self.heat_map_as_list(board.heat_map())
@@ -66,6 +68,7 @@ class Minimax:
             alpha = -math.inf
             beta = math.inf
             evaluated_boards = {}
+
             start = time.process_time()
             print(f'syvyys: {depth}')
 
@@ -74,17 +77,14 @@ class Minimax:
                 # lisätään uuden siirron vierusruudut listaan
                 next_moves = self.add_adjacent_cells(move, moves)
 
-                # siirto ei ole vielä osoittautunut voittavaksi tai välttämättömäksi
-                # puolustaa -> lasketaan sen arvo
-
                 board.set_cell(move, self.maximizer)
                 score = self.minmax(depth, board, next_moves, self.minimizer, alpha, beta, evaluated_boards)
                 board.set_empty(move)
-                print(f'siirto: {move} pisteet: {score}')
+                if self.__logger:
+                    print(f'({p_symbol}) siirto: {move} pisteet: {score}')
                 if score > best:
                     best = score
                     best_move = move
-                alpha = max(alpha, score)
 
             moves.remove(best_move)
             moves.append(best_move)
@@ -110,7 +110,7 @@ class Minimax:
             if evaluated_boards[board_key][0] == depth:
                 return evaluated_boards[board_key][1]
 
-        if depth <= 0:
+        if depth <= 0 or board.is_full():
             return 0
 
         if turn == self.maximizer:
@@ -177,3 +177,6 @@ class Minimax:
                 if heat_map[row][col] > 0:
                     res.append((row, col))
         return res
+
+    def set_logger_to(self, value: bool):
+        self.__logger = value

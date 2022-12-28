@@ -21,8 +21,10 @@ class Board:
             table.append(table_row)
         return table
 
-    def get_key(self):
-        return ''.join(map(str, self.__moves_made))
+    def get_key(self, moves=None):
+        if not moves:
+            moves = self.__moves_made
+        return ''.join(map(str, moves))
 
     def get_move_key(self, move, player):
         """ palauttaa siirron lukuarvon taulukosta """
@@ -68,6 +70,19 @@ class Board:
             return True
         return False
 
+    def set_cell2(self, cell: tuple, player):
+        """ Merkitsee ruutuun pelaajan merkin
+
+        palauttaa True jos merkintä on sallittu, muuten palautta False """
+
+        if not cell:
+            return False
+        row, col = cell
+        if self.is_on_board(cell) and self.__grid[row][col] == 0:
+            self.__grid[row][col] = player
+            return True
+        return False
+
     def is_empty(self, cell: tuple):
         """ Tarkistaa onko argumenttina saatu ruutu tyhjä """
 
@@ -84,6 +99,15 @@ class Board:
             if self.is_empty(cell):
                 return
             self.__moves_made.remove(self.get_move_key(cell, self.__grid[row][col]))
+            self.__grid[row][col] = 0
+
+    def set_empty2(self, cell: tuple):
+        """ Merkitsee argumenttina saadun ruudun tyhjäksi """
+
+        row, col = cell
+        if self.is_on_board(cell):
+            if self.is_empty(cell):
+                return
             self.__grid[row][col] = 0
 
     def clear(self):

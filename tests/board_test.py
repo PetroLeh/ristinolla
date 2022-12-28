@@ -1,13 +1,13 @@
 import unittest
 
-import util.board as board
+from util.board import Board
 
 class TestBoard(unittest.TestCase):
 
     def setUp(self):
         self.size = 10
         self.winning_length = 3
-        self.board = board.Board(self.size, self.winning_length)
+        self.board = Board(self.size, self.winning_length)
 
     def test_board_has_correct_size(self):        
         self.assertEqual(self.size, self.board.size())
