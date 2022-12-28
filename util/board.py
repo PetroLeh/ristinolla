@@ -53,14 +53,14 @@ class Board:
         row, col = cell
         if self.is_on_board(cell):
             return self.__grid[row][col]
-        return 0
+        return None
 
     def set_cell(self, cell: tuple, player):
         """ Merkitsee ruutuun pelaajan merkin
 
         palauttaa True jos merkintä on sallittu, muuten palautta False """
 
-        if not cell:
+        if not (cell and player):
             return False
         row, col = cell
         if self.is_on_board(cell) and self.__grid[row][col] == 0:
@@ -103,7 +103,7 @@ class Board:
     def is_winning(self, move: tuple, player):
         """ Tarkistaa muodostaako argumenttina saatu siirto voittavan suoran pelialueelle """
 
-        if not move:
+        if not (move and player):
             return False
 
     # apumetodeja voittosuoran tarkistamiseen
@@ -244,9 +244,3 @@ class Board:
 
     def winning_length(self):
         return self.__winning_length
-
-    def is_on_border(self, cell):
-        """ Tarkastaa onko annettu ruutu pelialueen reunalla """
-
-        row, col = cell
-        return row == 0 or col == 0 or row == self.size() - 1 or col == self.size() - 1

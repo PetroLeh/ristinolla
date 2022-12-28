@@ -11,6 +11,9 @@ class TestBoard(unittest.TestCase):
 
     def test_board_has_correct_size(self):        
         self.assertEqual(self.size, self.board.size())
+        
+    def test_winning_length(self):
+        self.assertEqual(self.winning_length, self.board.winning_length())
     
     def test_empty_board_is_filled_with_zeros(self):
         for row in self.board.grid():
@@ -20,6 +23,9 @@ class TestBoard(unittest.TestCase):
     
     def test_setting_a_value_to_empty_cell_works(self):
         player = 1
+        
+        self.assertFalse(self.board.set_cell(None, player))
+        self.assertFalse(self.board.set_cell((0, 0), None))
         
         self.assertEqual(self.board.get_cell((0, 0)), 0)
         self.board.set_cell((0, 0), player)
@@ -45,9 +51,15 @@ class TestBoard(unittest.TestCase):
     def test_empty_cell_check(self):
         player = 1
         self.assertTrue(self.board.is_empty((0, 0)))
+        self.assertFalse(self.board.is_empty((-1, 0)))
 
         self.board.set_cell((0, 0), player)
         self.assertFalse(self.board.is_empty((0, 0)))
+        
+        
+    def test_get_cell_out_of_board_is_none(self):
+        self.assertIsNone(self.board.get_cell((-1, -1)))
+        self.assertIsNone(self.board.get_cell((0, self.board.size())))
     
     def test_set_cell_empty(self):
         player = 1
@@ -55,6 +67,9 @@ class TestBoard(unittest.TestCase):
         self.board.set_cell((0, 0), player)
         self.assertFalse(self.board.is_empty((0, 0)))
 
+        self.board.set_empty((0, 0))
+        self.assertTrue(self.board.is_empty((0, 0)))
+        
         self.board.set_empty((0, 0))
         self.assertTrue(self.board.is_empty((0, 0)))
 
@@ -88,6 +103,9 @@ class TestBoard(unittest.TestCase):
         player_one = 1
         player_two = -1
         length = self.winning_length - 1
+        
+        self.assertFalse(self.board.is_winning(None, player_one))
+
         for i in range(length):
             move = (0, i)
             self.assertFalse(self.board.is_winning(move, player_one))
@@ -95,6 +113,7 @@ class TestBoard(unittest.TestCase):
         
         move = (0, length)
         self.assertFalse(self.board.is_winning(move, player_two))
+        
     
     def test_move_is_a_winning_move(self):
         player = 1
