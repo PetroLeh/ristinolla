@@ -132,7 +132,7 @@ class Minimax:
             score = math.inf
             for move in moves[::-1]:
                 if not board.is_empty(move):
-                    continue                
+                    continue
                 if board.is_winning(move, self.minimizer):
                     score = -math.inf
                 else:
